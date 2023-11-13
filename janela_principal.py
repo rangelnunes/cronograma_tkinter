@@ -3,7 +3,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from tkinter.messagebox import showinfo, askyesno, showwarning
 import database as db
-
+import janela_semestre
 
 conexao = db.conecta_bd()
 db.cria_tabelas(conexao)
@@ -13,7 +13,7 @@ window.title('Geração de cronogramas')
 
 style = ttk.Style(window)
 style.theme_use('clam') 
-
+#window.eval('tk::PlaceWindow . center')
 def screen_center(window_width, window_height):
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
@@ -28,12 +28,14 @@ def add_oferta():
     janela_oferta = tk.Toplevel(window)
     janela_oferta.title('Cadastro de ofertas')
     janela_oferta.resizable(False, False)        
-    
+
     x = window.winfo_x()
     y = window.winfo_y()
     w = janela_oferta.winfo_width()
     h = janela_oferta.winfo_height()  
     janela_oferta.geometry("+%d+%d" % (x, y))
+    janela_oferta.grab_set()
+    janela_oferta.wm_transient(window)
 
     estilo = ttk.Style()
     estilo.theme_use('clam')
@@ -310,7 +312,7 @@ schedule_button_img = Image.open("./images/icon_offer.png")
 schedule_button_img = schedule_button_img.resize((48, 48), Image.ANTIALIAS)
 schedule_button_img_tk = ImageTk.PhotoImage(schedule_button_img)
 schedule_button = tk.Button(toolbar, bd=0, padx=20, pady=5, font='Arial 12', fg='#3D3D3D',
-                                text="Adicionar Oferta", compound="top", image=schedule_button_img_tk,
+                                text="Gerenciar Ofertas", compound="top", image=schedule_button_img_tk,
                                 relief=tk.FLAT,
                                 command=add_oferta,height=10, width=30)
 
@@ -323,9 +325,9 @@ content_button_img = content_button_img.resize((48, 48), Image.ANTIALIAS)
 
 content_button_img_tk = ImageTk.PhotoImage(content_button_img)
 content_button = tk.Button(toolbar, padx=20, pady=5, font='Arial 12', fg='#3D3D3D',
-                                text="Adicionar Semestres", compound="top", border=0,
+                                text="Gerenciar Semestres", compound="top", border=0,
                                 image=content_button_img_tk, relief=tk.FLAT,
-                                command=None)
+                                command=janela_semestre.draw_window)
 content_button.image = content_button_img_tk
 content_button.pack(side=tk.LEFT, padx=2)
 
@@ -334,7 +336,7 @@ report_button_img = report_button_img.resize((48, 48), Image.ANTIALIAS)
 
 report_button_img_tk = ImageTk.PhotoImage(report_button_img)
 report_button = tk.Button(toolbar, padx=20, pady=5, font='Arial 12', fg='#3D3D3D', border=0, height=100,
-                            text="Adicionar Disciplinas", compound="top", image=report_button_img_tk, relief=tk.FLAT,
+                            text="Gerenciar Disciplinas", compound="top", image=report_button_img_tk, relief=tk.FLAT,
                             command=None)
 
 report_button.image = report_button_img_tk

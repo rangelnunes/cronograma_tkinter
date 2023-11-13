@@ -18,12 +18,15 @@ create table if not exists oferta(
     id integer primary key autoincrement, 
     ano integer not null references semestres(ano),
     semestre integer not null references semestres(semestre),
-    id_disciplina integer not null references disciplinas(id)
+    id_disciplina integer not null references disciplinas(id),
+    FOREIGN KEY (ano, semestre) REFERENCES semestres (ano, semestre)
 );
 """
 
 def conecta_bd():
     conexao = sqlite3.connect('cronograma_20232.db')
+    # habita o suporte à foreign key, pois elas são desabilitadas, por padrão
+    conexao.execute("PRAGMA foreign_keys = 1")
     return conexao
 
 def cria_tabelas(conexao):
@@ -33,7 +36,7 @@ def cria_tabelas(conexao):
 
 def lista_semestres(conexao):
     cursor = conexao.cursor()
-    cursor.execute('select * from semestres order by ano, semestre')
+    cursor.execute('select * from semestres order by ano desc, semestre desc;')
     return cursor.fetchall()
 
 def lista_disciplinas(conexao):
@@ -73,4 +76,35 @@ def delete_oferta(conexao, id_oferta):
     cursor.execute('delete from oferta where id = ?;',(id_oferta,))
     print(f"Oferta excluida com sucesso!")
     conexao.commit()
+
+def insere_semestre(conexao, ano, semestre):
+    try:
+        cursor = conexao.cursor()
+        linhas = None
+        erro = None
+        cursor.execute('insert into semestres values (?, ?);', (int(ano), int(semestre)))
+        conexao.commit()
+        linhas = cursor.rowcount
+        print('Semestre cadastrado com sucesso!')
+    except sqlite3.IntegrityError:
+        erro = 1
+    except sqlite3.Error:
+        erro = 2
+        print(f'Erro ao cadastrar o semestre: {erro}')
+
+    return linhas, erro
+
+def deleta_semestre(conexao, ano, semestre):
+    try:
+        cursor = conexao.cursor()
+        linhas = None
+        cursor.execute('delete from semestres where ano = ? and semestre = ?;', (ano, semestre))
+        conexao.commit()
+        linhas = cursor.rowcount
+    except sqlite3.IntegrityError:
+        print('Erro ao remover o semestre!')
+    except sqlite3.OperationalError:
+        print('não foi possível remover o semestre')
+    return linhas
+
 
