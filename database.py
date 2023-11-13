@@ -16,8 +16,8 @@ create table if not exists disciplinas (
 
 create table if not exists oferta(
     id integer primary key autoincrement, 
-    ano integer not null references semestres(ano),
-    semestre integer not null references semestres(semestre),
+    ano integer not null,
+    semestre integer not null,
     id_disciplina integer not null references disciplinas(id),
     FOREIGN KEY (ano, semestre) REFERENCES semestres (ano, semestre)
 );
@@ -98,13 +98,15 @@ def deleta_semestre(conexao, ano, semestre):
     try:
         cursor = conexao.cursor()
         linhas = None
-        cursor.execute('delete from semestres where ano = ? and semestre = ?;', (ano, semestre))
+        print(f'conexao {conexao}, ano: {ano}, {semestre}')
+        cursor.execute('delete from semestres where ano = ? and semestre = ?;', (int(ano), int(semestre)))
         conexao.commit()
         linhas = cursor.rowcount
+        print('linhas removidas', linhas)
     except sqlite3.IntegrityError:
         print('Erro ao remover o semestre!')
-    except sqlite3.OperationalError:
-        print('não foi possível remover o semestre')
+    #except sqlite3.OperationalError:
+    #    print('não foi possível remover o semestre')
     return linhas
 
 
